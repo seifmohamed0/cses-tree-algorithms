@@ -1,0 +1,54 @@
+#include <bits/stdc++.h> 
+#define ll long long 
+using namespace std;
+const int  mxn = 2e5 + 5 , N = 8e1 + 5 , mod = 1e9 + 7 , mod2 = 998244353 , inf = 0x3f;
+void sfsf(){
+	ios::sync_with_stdio(0);cin.tie(nullptr);cout.tie(nullptr);
+}
+int n ;
+vector<int>vi[mxn];
+int nod;
+void bfs(int node){
+	queue<int>q;
+	q.push(node);
+	bitset<mxn>vis;
+	vis[node] = true;
+	while(q.size()){
+		int curr = q.front();
+		nod = curr;
+		q.pop();
+		for(auto it : vi[curr]){
+			if(!vis[it]){
+				vis[it] = true;
+				q.push(it);
+			}
+		}
+	}
+}
+int dp[mxn];
+bool vis[mxn];
+void dfs(int node){
+	vis[node] = true;
+	for(auto it : vi[node]){
+		if(!vis[it]){
+			dfs(it);
+			dp[node] = max(dp[node] , dp[it] + 1);
+		}
+	}
+}
+int main(){
+	//freopen("a.txt","rt" , stdin);
+	//freopen("b.txt","w" , stdout); 
+	sfsf();
+	cin>>n;
+	for(int i = 0 ; i < n - 1 ; i++){
+		int u , v;
+		cin>>u>>v;
+		vi[u].push_back(v);
+		vi[v].push_back(u);
+	}
+	bfs(1);
+	dfs(nod);
+	cout<<dp[nod] ;
+	return 0;
+}	
