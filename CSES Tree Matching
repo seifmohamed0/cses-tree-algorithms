@@ -1,0 +1,46 @@
+#include <bits/stdc++.h> 	
+#define ll long long 
+using namespace std;
+ 
+const int  mxn = 2e5 + 5 , mod = 1e9 + 7 , inf = 0x3f , mod2 = 999119999 , mod3 = 1000992299 , pow1 = 31 , pow2 = 53 , Sqrt = 317 ;
+void seif(){
+	ios::sync_with_stdio(0);cin.tie(nullptr);cout.tie(nullptr);
+}
+int n ;
+vector<int>vi[mxn];
+int dp[mxn][2];
+void solve(int node,int par){
+	bool found = false;
+	for(auto it : vi[node]){
+		if(it != par){
+			solve(it , node);
+			found = true;
+		}
+	}
+	if(!found)return;
+	for(auto it : vi[node]){
+		if(it != par){
+			dp[node][0] += max(dp[it][0] , dp[it][1]);
+		}
+	}
+	for(auto it : vi[node]){
+		if(it != par){
+			dp[node][1] = max(dp[node][1],1 + dp[it][0] + (dp[node][0] - max(dp[it][0] , dp[it][1])));
+		}
+	}
+}
+int main(){
+	//freopen("a.txt","rt" , stdin);
+	//freopen("b.txt","w" , stdout);
+	seif();
+	cin>>n;
+	for(int i = 0 ; i < n - 1 ; i++){
+		int u , v;
+		cin>>u>>v;
+		vi[u].push_back(v);
+		vi[v].push_back(u);
+	}
+	solve(1 , -1);
+	cout<<max(dp[1][0] , dp[1][1]);
+	return 0; 
+}
