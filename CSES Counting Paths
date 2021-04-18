@@ -1,0 +1,125 @@
+#include <bits/stdc++.h>
+#include <ext/numeric>
+ 
+#include<ext/pb_ds/tree_policy.hpp>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/rope>
+using namespace std;
+using namespace __gnu_pbds;
+using namespace __gnu_cxx;
+template<class T> using Tree = tree<T, null_type, less<T>, rb_tree_tag,tree_order_statistics_node_update>;
+typedef tree<
+pair<int,int>,
+null_type,
+less<pair<int,int>>,
+rb_tree_tag,
+tree_order_statistics_node_update>
+ordered_set;
+using namespace std;
+#define go ios::sync_with_stdio(0);cin.tie(nullptr);cout.tie(nullptr);
+#define ll long long
+typedef vector<vector<int>>vvi;
+typedef complex<long double>Point;
+const double Pi = acos(-1.0) , eps = 1e-8;
+#define X real()
+#define Y imag()
+#define Angle(v) (atan2((v).Y , (v).X))
+#define Length(v) ((long double)hypot((v).Y , (v).X))
+#define Lengthsqr(v) (dot((v) , (v)))
+const int mxn = 2e5+ 5, mod = 1e9 + 7, MOD = 1e9 + 7 , mod2 = 998244353;
+int tbl[mxn][20] , n , m ,st[mxn] , en[mxn] , frq[mxn] , frq2[mxn] , frq3[mxn];
+int tim  , ans[mxn];
+vector<int>vi[mxn];
+ 
+void dfs(int node , int par){
+	st[node] = ++tim;
+	for(auto it : vi[node]){
+		if(it != par){
+			dfs(it , node);
+		}
+	}
+	en[node] = ++tim;
+}
+void dfs2(int node =  1, int par = 1){
+	ans[node] = frq[node] + frq3[node] ;
+	for(auto it : vi[node]){
+		if(it !=par){
+			dfs2(it , node);
+			ans[node] += ans[it] + frq2[it];
+		}
+	}
+}
+void dfs3(int node = 1 , int par = 1 ){
+	tbl[node][0] = par;
+	for(auto it : vi[node]){
+		if(it != par){
+			dfs3(it , node);
+		}
+	}
+}
+bool anc(int par , int node){
+	return st[par] <= st[node] && en[par] >= en[node];
+}
+void bingo(){
+	cin>>n>>m;
+	for(int i = 2 ;i <= n ; i++){
+		int u , v;
+		cin>>u>>v;
+		vi[u].push_back(v);
+		vi[v].push_back(u);
+	}
+	dfs3();
+	int mx = log2(n) + 1;
+	for(int i = 1; i <= mx ; i++){
+		for(int j = 2;  j <= n ; j++){
+			tbl[j][i] = tbl[tbl[j][i-1]][i-1];
+		}
+	}
+	dfs(1 , -1);
+	while(m--){
+		int u , v , uu , vv;
+		cin>>u>>v;
+		uu = u;
+		vv = v;
+		if(anc(u , v)){
+			frq[v]++;
+			frq2[u]--;
+			continue;
+		}
+		if(anc(v , u)){
+			frq[u]++;
+			frq2[v]--;
+			continue;
+		}
+		for(int i = 18 ; i >= 0; i--){
+			int ut = tbl[u][i];
+			if(ut >= 1 && ut <= n){
+				if(!anc(ut , u )|| !anc(ut , v)){
+			 		u = ut;
+				}
+			}
+		}
+		int nod = (tbl[u][0] >= 1 ? (tbl[u][0] <= n ? tbl[u][0] : 1) : 1);
+		frq[uu]++;
+		frq[vv]++;
+		frq2[nod]-=1;
+		frq3[nod]-=1;
+	}
+	dfs2();
+	for(int i = 1; i <= n ; i++)
+		cout<<ans[i]<<" ";
+}
+int main() {
+	go
+#ifdef LOCAL
+	freopen("input.in", "rt", stdin);
+//	freopen("output.out", "wt", stdout);
+#endif
+	//freopen("card.in", "rt", stdin);
+	int t = 1;
+	//cin>>t;
+	while(t--){
+		bingo();
+	}
+	return 0;
+}
